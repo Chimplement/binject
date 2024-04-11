@@ -4,10 +4,17 @@
 #include <unistd.h>
 
 int main() {
-    unsigned char program[] = {
-        0xb8, 0x3c, 0x00, 0x00, 0x00,   // mov 0x3c, eax
-        0xbf, 0x00, 0x00, 0x00, 0x00,   // mov 0x0, edi
-        0x0f, 0x05                      // syscall
+    unsigned char program[] = {                                     // 0x400078:
+        0x48, 0xC7, 0xC0, 0x01, 0x00, 0x00, 0x00,                   // mov rax, 1
+        0x48, 0xC7, 0xC7, 0x01, 0x00, 0x00, 0x00,                   // mov rdi, 1
+        0x48, 0xbe, 0xA9, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs rsi,0x4000A9
+        0x48, 0xC7, 0xC2, 0x0E, 0x00, 0x00, 0x00,                   // mov rdx, 14
+        0x0F, 0x05,                                                 // syscall
+        0x48, 0xC7, 0xC0, 0x3C, 0x00, 0x00, 0x00,                   // mov rax, 60
+        0x48, 0xC7, 0xC7, 0x00, 0x00, 0x00, 0x00,                   // mov rdi, 0
+        0x0F, 0x05,                                                 // syscall
+        // 0x4000A9:
+        'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!', '\n',
     };
 
     Elf64_Ehdr elf_header = {
@@ -44,7 +51,7 @@ int main() {
         .p_align = 0x1000,
     };
 
-    int fd = open("test.out", O_WRONLY | O_CREAT, 0744);
+    int fd = open("hello_world.out", O_WRONLY | O_CREAT, 0744);
     if (fd == -1)
         return (0);
 
