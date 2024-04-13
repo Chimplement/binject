@@ -8,8 +8,6 @@
 
 #include <sys/mman.h>
 
-int generate_small_bin();
-
 int main(int argc, char* argv[]) {
     if (argc < 2) return (1);
 
@@ -28,7 +26,7 @@ int main(int argc, char* argv[]) {
 
     unsigned char* map = mmap(NULL, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
     (void)close(fd);
-    if (map == NULL) {
+    if (map == MAP_FAILED) {
         return (1);
     }
 
