@@ -4,16 +4,15 @@
 #include <unistd.h>
 
 int generate_small_bin() {
-    unsigned char program[] = {                                     // 0x400078:
-        0x48, 0xC7, 0xC0, 0x01, 0x00, 0x00, 0x00,                   // mov rax, 1
-        0x48, 0xC7, 0xC7, 0x01, 0x00, 0x00, 0x00,                   // mov rdi, 1
-        0x48, 0xbe, 0xA9, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs rsi,0x4000A9
-        0x48, 0xC7, 0xC2, 0x0E, 0x00, 0x00, 0x00,                   // mov rdx, 14
-        0x0F, 0x05,                                                 // syscall
-        0x48, 0xC7, 0xC0, 0x3C, 0x00, 0x00, 0x00,                   // mov rax, 60
-        0x48, 0xC7, 0xC7, 0x00, 0x00, 0x00, 0x00,                   // mov rdi, 0
-        0x0F, 0x05,                                                 // syscall
-        // 0x4000A9:
+    unsigned char program[] = {
+        0xb8, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%eax
+        0xbf, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%edi
+        0x48, 0x8d, 0x35, 0x11, 0x00, 0x00, 0x00,   // lea    0x11(%rip),%rsi
+        0xba, 0x0e, 0x00, 0x00, 0x00,               // mov    $0xe,%edx
+        0x0f, 0x05,                                 // syscall
+        0xb8, 0x3c, 0x00, 0x00, 0x00,               // mov    $0x3c,%eax
+        0x48, 0x31, 0xff,                           // xor    %rdi,%rdi
+        0x0f, 0x05,
         'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!', '\n',
     };
 
@@ -26,10 +25,10 @@ int generate_small_bin() {
             ELFOSABI_SYSV,
             0, 0, 0, 0, 0, 0, 0, 0
         },
-        .e_type = ET_EXEC,
+        .e_type = ET_DYN,
         .e_machine = EM_X86_64,
         .e_version = EV_CURRENT,
-        .e_entry = 0x400000 + sizeof(Elf64_Ehdr) + sizeof(Elf64_Phdr),
+        .e_entry = 0x1000 + sizeof(Elf64_Ehdr) + sizeof(Elf64_Phdr),
         .e_phoff = sizeof(Elf64_Ehdr),
         .e_shoff = 0x0,
         .e_flags = 0x0,
@@ -43,7 +42,7 @@ int generate_small_bin() {
     Elf64_Phdr program_header = {
         .p_type = PT_LOAD,
         .p_offset = sizeof(Elf64_Ehdr) + sizeof(Elf64_Phdr),
-        .p_vaddr = 0x400000 + sizeof(Elf64_Ehdr) + sizeof(Elf64_Phdr),
+        .p_vaddr = 0x1000 + sizeof(Elf64_Ehdr) + sizeof(Elf64_Phdr),
         .p_paddr = 0x0,
         .p_filesz = sizeof(program),
         .p_memsz = sizeof(program),
