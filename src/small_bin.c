@@ -12,7 +12,7 @@ int generate_small_bin() {
         0x0f, 0x05,                                 // syscall
         0xb8, 0x3c, 0x00, 0x00, 0x00,               // mov    $0x3c,%eax
         0x48, 0x31, 0xff,                           // xor    %rdi,%rdi
-        0x0f, 0x05,
+        0x0f, 0x05,                                 // syscall
         'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!', '\n',
     };
 
