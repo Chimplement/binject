@@ -12,13 +12,13 @@ long max(long a, long b) {
     return (b);
 }
 
-unsigned long ulmin(unsigned long a, unsigned long b) {
+unsigned long umin(unsigned long a, unsigned long b) {
     if (a < b)
         return (a);
     return (b);
 }
 
-unsigned long ulmax(unsigned long a, unsigned long b) {
+unsigned long umax(unsigned long a, unsigned long b) {
     if (a > b)
         return (a);
     return (b);

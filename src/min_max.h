@@ -4,7 +4,7 @@
 long min(long a, long b);
 long max(long a, long b);
 
-unsigned long ulmin(unsigned long a, unsigned long b);
-unsigned long ulmax(unsigned long a, unsigned long b);
+unsigned long umin(unsigned long a, unsigned long b);
+unsigned long umax(unsigned long a, unsigned long b);
 
 #endif
