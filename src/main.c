@@ -39,11 +39,13 @@ int map_file(int fd, int prot, int flags, void** map, size_t* map_size) {
 }
 
 unsigned char program[] = {
+    0x52,                                       // push   %rdx
     0xb8, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%eax
     0xbf, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%edi
-    0x48, 0x8d, 0x35, 0x10, 0x00, 0x00, 0x00,   // lea    0x10(%rip),%rsi
+    0x48, 0x8d, 0x35, 0x11, 0x00, 0x00, 0x00,   // lea    0x11(%rip),%rsi
     0xba, 0x0e, 0x00, 0x00, 0x00,               // mov    $0xe,%edx
     0x0f, 0x05,                                 // syscall
+    0x5a,                                       // pop    %rdx
     0x48, 0x8d, 0x05, 0xff, 0xff, 0xff, 0xff,   // lea    -0x1(%rip),%rax
     0xff, 0xe0,                                 // jmp    *%rax
     'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!', '\n',
@@ -84,9 +86,9 @@ int main(int argc, char* argv[]) {
                     if (code_cave != NULL)
                     {
                         printf("code_cave: %p\n", (void*)((char*)code_cave - (char*)map));
-                        int offset = elf_header->e_entry - ((char*)code_cave - (char*)map) - 31;
+                        int offset = elf_header->e_entry - ((char*)code_cave - (char*)map) - 33;
                         printf("jmp offset: %x (%i)\n", offset, offset);
-                        memcpy(program + 27, &offset, 4);
+                        memcpy(program + 29, &offset, 4);
                         memcpy(code_cave, program, sizeof(program));
                         program_headers[i].p_filesz += sizeof(program) + 100;
                         program_headers[i].p_memsz += sizeof(program) + 100;
