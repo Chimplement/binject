@@ -17,6 +17,8 @@
 #include "elf_map.h"
 #include "str_manip.h"
 
+#define CODE_CAVE_PADDING 8
+
 uint8_t payload_prefix[] = {
     0x48, 0x8d, 0x05, 0xff, 0xff, 0xff, 0xff,   // lea  -0x1(%rip),%rax
     0x50,                                       // push %rax
@@ -85,8 +87,8 @@ int main(int argc, char* argv[]) {
     uint8_t* code_cave = (uint8_t*)find_code_cave(
         elf_map.start + executable_header->p_offset,
         sizeof(payload_prefix) + payload_size,
-        executable_header->p_filesz + sizeof(payload_prefix) + payload_size + 16,
-        8
+        executable_header->p_filesz + sizeof(payload_prefix) + payload_size + CODE_CAVE_PADDING * 2,
+        CODE_CAVE_PADDING
     );
 
     if (code_cave == NULL) {
