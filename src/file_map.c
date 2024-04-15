@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#include "file_mapping.h"
+#include "file_map.h"
 
 off_t get_file_size(int fd) {
     off_t original_offset = lseek(fd, 0, SEEK_CUR);
