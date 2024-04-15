@@ -8,7 +8,7 @@ BITS 64
     mov rdx, message_len
     syscall
     
-    pop rdx                 ; save DT_FINI
+    pop rdx                 ; restore DT_FINI
 
     ret                     ; return to original entry point
 
