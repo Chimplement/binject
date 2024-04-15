@@ -1,16 +1,16 @@
 BITS 64
 
-    push rdx
+    push rdx                ; save DT_FINI
 
-    mov rax, 1
-    mov rdi, 1
+    mov rax, 1              ; write
+    mov rdi, 1              ; stdout
     lea rsi, [rel message]
     mov rdx, message_len
     syscall
     
-    pop rdx
+    pop rdx                 ; save DT_FINI
 
-    ret
+    ret                     ; return to original entry point
 
 message:
     db "Hello, World!", 10
