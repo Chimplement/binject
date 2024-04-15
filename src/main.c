@@ -10,7 +10,7 @@
 
 #include "min_max.h"
 #include "mem_search.h"
-#include "file_mapping.h"
+#include "file_map.h"
 
 unsigned char shell_code[] = {
     0x52,                                       // push   %rdx
