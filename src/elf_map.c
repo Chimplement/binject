@@ -27,7 +27,7 @@ Elf64_Phdr* find_program_header(elf64_map_t elf_map, Elf64_Word type, Elf64_Word
 
     for (unsigned int i = 0; i < elf_map.header->e_phnum; i++) {
         ph = elf_map.program_headers + i;
-        if (ph->p_type == type && ph->p_flags & flags == flags) {
+        if (ph->p_type == type && (ph->p_flags & flags) == flags) {
             return (ph);
         }
     }
