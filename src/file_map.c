@@ -61,12 +61,12 @@ void* alloc_file(int fd, size_t* file_size_buffer) {
     return(buffer);
 }
 
-void* alloc_file_at_path(char* path, size_t* file_size_buffer) {
+void* alloc_file_at_path(const char* path, size_t* file_size_buffer) {
     int fd = open(path, O_RDONLY);
     if (fd == -1) {
         return (NULL);
     }
-    void* buffer = load_file(fd, file_size_buffer);
+    void* buffer = alloc_file(fd, file_size_buffer);
     (void)close(fd);
     return(buffer);
 }
