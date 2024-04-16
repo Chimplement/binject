@@ -40,33 +40,12 @@ int main(int argc, char* argv[]) {
     }
     close(target_fd);
 
-    int payload_fd = open(argv[2], O_RDONLY);
-    if (payload_fd == -1) {
-        (void)munmap(map, map_size);
-        return (1);
-    }
-
-    off_t payload_size = get_file_size(payload_fd);
-    if (payload_size == (off_t)-1) {
-        (void)munmap(map, map_size);
-        close(payload_fd);
-        return (1);
-    }
-
-    uint8_t* payload = malloc(payload_size);
+    size_t payload_size;
+    uint8_t* payload = load_file(argv[2], &payload_size);
     if (payload == NULL) {
         (void)munmap(map, map_size);
-        close(payload_fd);
         return (1);
     }
-    if (read(payload_fd, payload, payload_size) == -1) {
-        (void)munmap(map, map_size);
-        close(payload_fd);
-        free(payload);
-        return (1);
-    }
-    (void)close(payload_fd);
-
 
     elf64_map_t elf_map = map_elf64(map, map_size);
     if (elf_map.start == NULL) {
