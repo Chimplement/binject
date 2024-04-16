@@ -27,21 +27,14 @@ uint8_t payload_prefix[] = {
 int main(int argc, char* argv[]) {
     if (argc < 3) return (1);
 
-    int target_fd = open(argv[1], O_RDONLY);
-    if (target_fd == -1) {
-        return (1);
-    }
-
-    unsigned char* map;
     size_t map_size;
-    if (map_file(target_fd, PROT_READ | PROT_WRITE, MAP_PRIVATE, (void**)&map, &map_size) == -1) {
-        close(target_fd);
+    uint8_t* map = map_file_at_path(argv[1], PROT_READ | PROT_WRITE, MAP_PRIVATE, &map_size);
+    if (map == MAP_FAILED) {
         return (1);
     }
-    close(target_fd);
 
     size_t payload_size;
-    uint8_t* payload = load_file(argv[2], &payload_size);
+    uint8_t* payload = alloc_file_at_path(argv[2], &payload_size);
     if (payload == NULL) {
         (void)munmap(map, map_size);
         return (1);
