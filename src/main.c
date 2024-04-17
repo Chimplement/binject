@@ -61,9 +61,9 @@ int main(int argc, char* argv[]) {
     }
 
     uint8_t* code_cave = (uint8_t*)find_code_cave(
-        elf_map.start + executable_header->p_offset,
+        elf_map.start + executable_header->p_offset + executable_header->p_filesz,
         sizeof(payload_prefix) + payload_size,
-        executable_header->p_filesz + sizeof(payload_prefix) + payload_size + CODE_CAVE_PADDING * 2,
+        sizeof(payload_prefix) + payload_size + CODE_CAVE_PADDING * 2 + 100,
         CODE_CAVE_PADDING
     );
 
