@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#include "file_map.h"
+#include "file_io.h"
 
 off_t get_file_size(int fd) {
     off_t original_offset = lseek(fd, 0, SEEK_CUR);

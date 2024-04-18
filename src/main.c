@@ -13,7 +13,7 @@
 
 #include "min_max.h"
 #include "mem_search.h"
-#include "file_map.h"
+#include "file_io.h"
 #include "elf_map.h"
 #include "str_manip.h"
 #include "help.h"

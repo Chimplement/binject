@@ -1,5 +1,5 @@
-#ifndef FILE_MAPPING_H
-# define FILE_MAPPING_H
+#ifndef FILE_IO_H
+# define FILE_IO_H
 
 # include <unistd.h>
 
