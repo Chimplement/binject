@@ -1,18 +1,10 @@
 #include <stdint.h>
-#include <elf.h>
-
-#include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
-
 #include <stdlib.h>
-#include <string.h>
 #include <libgen.h>
-
 #include <sys/mman.h>
 
-#include "min_max.h"
-#include "mem_search.h"
 #include "str_manip.h"
 #include "file_io.h"
 #include "elf_map.h"
