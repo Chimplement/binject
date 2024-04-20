@@ -13,7 +13,7 @@ uint8_t elf_class(void* start, size_t size) {
     if (size < 5) {
         return (0);
     }
-    return (((uint8_t*)start)[4]);
+    return (((uint8_t*)start)[EI_CLASS]);
 }
 
 elf64_map_t map_elf64(void* start, size_t size) {
