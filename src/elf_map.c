@@ -38,7 +38,7 @@ elf64_map_t map_elf64(void* start, size_t size) {
     return (elf_map);
 }
 
-Elf64_Phdr* find_program_header(elf64_map_t elf_map, Elf64_Word type, Elf64_Word flags) {
+Elf64_Phdr* find_program_header64(elf64_map_t elf_map, Elf64_Word type, Elf64_Word flags) {
     Elf64_Phdr* ph;
 
     for (unsigned int i = 0; i < elf_map.header->e_phnum; i++) {

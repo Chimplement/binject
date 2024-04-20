@@ -1,12 +1,16 @@
-#include "elf_map.h"
+#include <elf.h>
+#include <string.h>
 
 #include "elf_map.h"
+#include "mem_search.h"
+#include "min_max.h"
 
 #include "inject.h"
 
 #define CODE_CAVE_PADDING 8
 
 int inject32(void* map, size_t map_size, void* payload, size_t payload_size) {
+    (void) map, (void) map_size, (void) payload, (void) payload_size;
     return (-1);
 }
 
@@ -21,7 +25,7 @@ int inject64(void* map, size_t map_size, void* payload, size_t payload_size) {
         return (-1);
     }
 
-    Elf64_Phdr* executable_header = find_program_header(elf_map, PT_LOAD, PF_R | PF_X);
+    Elf64_Phdr* executable_header = find_program_header64(elf_map, PT_LOAD, PF_R | PF_X);
     if (executable_header == NULL) {
         return (-1);
     }

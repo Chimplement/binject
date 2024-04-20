@@ -52,12 +52,14 @@ int main(int argc, char* argv[]) {
                 free(payload);
                 exit_error("failed to find a suitable location for the payload");
             }
+            break;
         case ELFCLASS64:
             if (inject64(map, map_size, payload, payload_size) == -1) {
                 (void)munmap(map, map_size);
                 free(payload);
                 exit_error("failed to find a suitable location for the payload");
             }
+            break;
         default:
             (void)munmap(map, map_size);
             free(payload);
