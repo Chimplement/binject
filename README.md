@@ -12,7 +12,7 @@ Binject will automatically find a suitable code cave to write the payload into a
 Running Binject takes a target elf binary and a payload to inject.
 
 
-The payload is just a binary file with the instructions to inject and will start execution on the first byte. Returning to the original program is as easy as adding a `ret` instruction. For some example payload programs see [here](examples/).
+The payload is just a binary file with the instructions to inject and will start execution on the first byte. Returning to the original program is as easy as adding a `ret` instruction. You can find a couple of example payloads in the [examples directory](examples/).
 
 Once its done injecting the payload it will create a new file ending with 
 `.infected` so you don't have to worry about overwriting your binaries.
