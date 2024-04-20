@@ -1,4 +1,20 @@
+#include <string.h>
+
 #include "elf_map.h"
+
+bool is_elf(void* start, size_t size) {
+    if (size < 4) {
+        return (false);
+    }
+    return (!memcmp(start, "\x7f""ELF", 4));
+}
+
+uint8_t elf_class(void* start, size_t size) {
+    if (size < 5) {
+        return (0);
+    }
+    return (((uint8_t*)start)[4]);
+}
 
 elf64_map_t map_elf64(void* start, size_t size) {
     elf64_map_t elf_map;

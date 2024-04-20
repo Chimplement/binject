@@ -3,8 +3,9 @@
 
 # include <stddef.h>
 # include <stdint.h>
+# include <stdbool.h>
 
-# include "elf.h"
+# include <elf.h>
 
 typedef struct
 {
@@ -16,6 +17,9 @@ typedef struct
     Elf64_Phdr* program_headers;
     Elf64_Shdr* section_headers;
 }   elf64_map_t;
+
+bool is_elf(void* start, size_t size);
+uint8_t elf_class(void* start, size_t size);
 
 elf64_map_t map_elf64(void* start, size_t size);
 
