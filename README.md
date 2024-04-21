@@ -3,8 +3,7 @@ Binject is a simple payload injector for 32-bit and 64-bit ELF binaries.
 
 ## Features
 Binject allows the user to inject an existing elf binary with a binary payload, 
-which will be executed at the start when executing the binary. After which it can jump 
-back the original entry point of the executable.
+which will be executed at the start when executing the binary. After which it can jump back the original entry point of the binary.
 
 Binject will automatically find a suitable code cave to write the payload into and edit the program headers accordingly. It won't touch the section headers so a simple `objdump` won't show the injected code.
 
